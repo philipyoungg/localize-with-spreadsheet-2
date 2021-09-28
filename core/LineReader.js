@@ -49,26 +49,25 @@ GSReader.prototype.fetchAllCells = async function() {
   }
 }
 
-GSReader.prototype.select = async function(keyCol, valCol) {
+GSReader.prototype.select = async function(keyCol, valCol, fallbackValCol) {
   const self = this
 
   const cells = await self.fetchAllCells()
 
-  return self.extractFromRawData(cells, keyCol, valCol)
+  return self.extractFromRawData(cells, keyCol, valCol, fallbackValCol)
 }
 
-GSReader.prototype.extractFromRawData = function(rawWorksheets, keyCol, valCol) {
+GSReader.prototype.extractFromRawData = function(rawWorksheets, keyCol, valCol, fallbackValCol) {
   const extractedLines = []
 
   for (let i = 0; i < rawWorksheets.length; i++) {
-    const extracted = this.extractFromWorksheet(rawWorksheets[i], keyCol, valCol)
+    const extracted = this.extractFromWorksheet(rawWorksheets[i], keyCol, valCol, fallbackValCol)
     extractedLines.push.apply(extractedLines, extracted)
   }
-
   return extractedLines
 }
 
-GSReader.prototype.extractFromWorksheet = function(rawWorksheet, keyCol, valCol) {
+GSReader.prototype.extractFromWorksheet = function(rawWorksheet, keyCol, valCol, fallbackValCol) {
   let results = [];
 
   // const rows = this.flatenWorksheet(rawWorksheet);
@@ -79,7 +78,7 @@ GSReader.prototype.extractFromWorksheet = function(rawWorksheet, keyCol, valCol)
   if (headers) {
     let keyIndex = -1
     let valIndex = -1;
-
+    let fallbackValIndex = -1;
     for (let i = 0; i < headers.length; i++) {
       const value = headers[i].value;
 
@@ -89,7 +88,12 @@ GSReader.prototype.extractFromWorksheet = function(rawWorksheet, keyCol, valCol)
       if (value === valCol) {
         valIndex = i;
       }
+
+      if (value === fallbackValCol) {
+        fallbackValIndex = i;
+      }
     }
+
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
 
@@ -97,9 +101,10 @@ GSReader.prototype.extractFromWorksheet = function(rawWorksheet, keyCol, valCol)
         try {
           const keyValue = row[keyIndex].value;
           const valValue = row[valIndex].value;
-
+          const fallbackValValue = row[fallbackValIndex].value;
           if (keyValue) {
-            results.push(new Line(keyValue, valValue));
+            let normalizedValValue = valValue != null ? valValue : fallbackValValue;
+            results.push(new Line(keyValue, normalizedValValue));
           }
 
         } catch (err) {

@@ -20,6 +20,10 @@ Gs2File.prototype.setValueCol = function(valueCol) {
   this._defaultValueCol = valueCol
 }
 
+Gs2File.prototype.setFallbackValueCol = function(valueCol) {
+  this._defaultFallbackValueCol = valueCol
+}
+
 Gs2File.prototype.setKeyCol = function(keyCol) {
   this._defaultKeyCol = keyCol
 }
@@ -40,6 +44,7 @@ Gs2File.prototype.save = async function(outputPath, opts) {
 
   let keyCol = opts.keyCol
   let valueCol = opts.valueCol
+  let fallbackValueCol = opts.fallbackValueCol
   let format = opts.format
   let encoding = opts.encoding
 
@@ -49,6 +54,10 @@ Gs2File.prototype.save = async function(outputPath, opts) {
 
   if (!valueCol) {
     valueCol = this._defaultValueCol
+  }
+
+  if (!fallbackValueCol) {
+    fallbackValueCol = this._defaultFallbackValueCol
   }
 
   if (!format) {
@@ -62,7 +71,7 @@ Gs2File.prototype.save = async function(outputPath, opts) {
     }
   }
 
-  const lines = await this._reader.select(keyCol, valueCol)
+  const lines = await this._reader.select(keyCol, valueCol, fallbackValueCol)
 
   if (lines) {
     const transformer = Transformer[format || 'android']
