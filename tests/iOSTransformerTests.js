@@ -1,8 +1,6 @@
 var transformer = require("../core/Transformer.js")['ios']
 var EOL = require('../core/Constants').EOL
 
-console.log(EOL === "\n")
-
 exports.testComment = function(test) {
   var result = transformer.transformComment('un commentaire');
 

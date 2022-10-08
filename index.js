@@ -37,7 +37,6 @@ Gs2File.prototype.setEncoding = function(encoding) {
 }
 
 Gs2File.prototype.save = async function(outputPath, opts) {
-  console.log('saving ' + outputPath)
   const self = this
 
   opts = opts || {}

@@ -81,7 +81,6 @@ GSReader.prototype.extractFromWorksheet = function(rawWorksheet, keyCol, valCol,
     let fallbackValIndex = -1;
     for (let i = 0; i < headers.length; i++) {
       const value = headers[i].value;
-
       if (value === keyCol) {
         keyIndex = i;
       }
